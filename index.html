@@ -81,13 +81,23 @@
       margin: 20px 0;
       border: 2px dashed rgba(255,255,255,0.3);
     }
+
+    /* Floating join button */
+    .floating-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 999;
+    }
   </style>
 </head>
 <body>
 
+<!-- Top header with visible join button -->
 <header>
   <h1>🌟 Welcome to Our Discord Community!</h1>
-  <p>🎮 Chat, 🤝 Connect, and Have Fun with People Who Share Your Interests!</p>
+  <p>🎮 Chat, 🤝 Connect, and 🌈 Have Fun with People Who Share Your Interests!</p>
+  <a class="btn" href="https://discord.gg/EycKmusR6v" target="_blank">🚀 Join Discord Now</a>
 </header>
 
 <section>
@@ -122,11 +132,14 @@
 
 <section>
   <h2>🔥 How to Join</h2>
-  <p>After exploring our page and learning about the community, you can click the button below to join us on Discord! 🌟</p>
+  <p>After exploring our page and learning about the community, click the button below to join us on Discord! 🌟</p>
   <p style="text-align:center;">
     <a class="btn" href="https://discord.gg/EycKmusR6v" target="_blank">🚀 Join Now!</a>
   </p>
 </section>
+
+<!-- Floating join button -->
+<a class="btn floating-btn" href="https://discord.gg/EycKmusR6v" target="_blank">🚀 Join Discord</a>
 
 <footer>
   <p>&copy; 2025 Discord Community | <a href="https://discord.gg/EycKmusR6v">Join Now</a></p>

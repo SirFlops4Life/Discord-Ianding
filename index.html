@@ -24,10 +24,7 @@
       border-radius: 20px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
-    header h1 {
-      font-size: 3em;
-      margin-bottom: 20px;
-    }
+    header h1 { font-size: 3em; margin-bottom: 20px; }
     header p { font-size: 1.3em; margin-bottom: 30px; }
     .btn {
       display: inline-block;
@@ -54,7 +51,6 @@
     footer { text-align: center; padding: 40px 20px; }
     .sticky-btn { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); }
 
-    /* Mini-game styles */
     #gameBox {
       margin-top: 20px;
       padding: 20px;
@@ -92,14 +88,22 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
-let player = { x: 190, y: 350, size: 20, speed: 4, color: "#0f0" };
-let enemies = [];
-let bullets = [];
-let powerUps = [];
-let score = 0;
-let keys = {};
-let enemySpawnRate = 1000;
-let enemySpeedBase = 2;
+let player, enemies, bullets, score, keys, enemySpawnRate, enemySpeedBase;
+let gameInterval;
+
+function initGame() {
+  player = { x: 190, y: 350, size: 20, speed: 2.5, color: "#0f0" };
+  enemies = [];
+  bullets = [];
+  score = 0;
+  keys = {};
+  enemySpawnRate = 1000;
+  enemySpeedBase = 1.5;
+
+  clearInterval(gameInterval);
+  gameInterval = setInterval(spawnEnemy, enemySpawnRate);
+  requestAnimationFrame(loop);
+}
 
 document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
@@ -107,14 +111,6 @@ document.addEventListener('keyup', e => keys[e.key] = false);
 function spawnEnemy() {
   enemies.push({ x: Math.random() * 380, y: -20, size: 20, speed: enemySpeedBase + Math.random() * 2 });
 }
-setInterval(spawnEnemy, enemySpawnRate);
-
-function spawnPowerUp() {
-  const types = ["speed", "shield"];
-  const type = types[Math.floor(Math.random() * types.length)];
-  powerUps.push({ x: Math.random() * 380, y: -20, size: 15, type });
-}
-setInterval(() => { if (Math.random() < 0.1) spawnPowerUp(); }, 2000);
 
 function update() {
   // Player movement
@@ -126,7 +122,7 @@ function update() {
   // Shooting
   if (keys[' ']) {
     bullets.push({ x: player.x + player.size / 2 - 3, y: player.y, size: 6, speed: 6 });
-    keys[' '] = false; // prevent continuous shooting
+    keys[' '] = false; // prevent bullet spam
   }
 
   // Update bullets
@@ -135,7 +131,9 @@ function update() {
 
   // Update enemies
   enemies.forEach(e => e.y += e.speed);
-  enemies = enemies.filter(e => e.y < 420);
+
+  // Enemy speed increases with score
+  enemies.forEach(e => e.speed = enemySpeedBase + score / 100);
 
   // Collision bullets vs enemies
   bullets.forEach((b, i) => {
@@ -150,32 +148,17 @@ function update() {
   });
 
   // Collision player vs enemies
-  enemies.forEach(e => {
+  for (let e of enemies) {
     if (player.x < e.x + e.size && player.x + player.size > e.x &&
         player.y < e.y + e.size && player.y + player.size > e.y) {
-      alert('Game Over! Your score: ' + score);
-      location.reload();
+      // Reset game completely
+      initGame();
+      return;
     }
-  });
-
-  // Power-up collection
-  powerUps.forEach((p, i) => {
-    if (player.x < p.x + p.size && player.x + player.size > p.x &&
-        player.y < p.y + p.size && player.y + player.size > p.y) {
-      if (p.type === "speed") player.speed += 2;
-      powerUps.splice(i, 1);
-    }
-  });
-
-  // Move power-ups
-  powerUps.forEach(p => p.y += 2);
-  powerUps = powerUps.filter(p => p.y < 420);
-
-  // Increase difficulty
-  if (score % 50 === 0 && score !== 0) {
-    enemySpeedBase += 0.1;
-    enemySpawnRate = Math.max(200, enemySpawnRate - 20);
   }
+
+  // Remove off-screen enemies
+  enemies = enemies.filter(e => e.y < 420);
 
   document.getElementById("score").innerText = "Score: " + score;
 }
@@ -183,27 +166,27 @@ function update() {
 function draw() {
   ctx.clearRect(0, 0, 400, 400);
 
-  // Draw player
+  // Player
   ctx.fillStyle = player.color;
   ctx.fillRect(player.x, player.y, player.size, player.size);
 
-  // Draw enemies
+  // Enemies
   ctx.fillStyle = "#f00";
   enemies.forEach(e => ctx.fillRect(e.x, e.y, e.size, e.size));
 
-  // Draw bullets
+  // Bullets
   ctx.fillStyle = "#ff0";
   bullets.forEach(b => ctx.fillRect(b.x, b.y, b.size, b.size));
-
-  // Draw power-ups
-  powerUps.forEach(p => {
-    ctx.fillStyle = p.type === "speed" ? "#0ff" : "#f0f";
-    ctx.fillRect(p.x, p.y, p.size, p.size);
-  });
 }
 
-function loop() { update(); draw(); requestAnimationFrame(loop); }
-loop();
+function loop() {
+  update();
+  draw();
+  requestAnimationFrame(loop);
+}
+
+// Start the game
+initGame();
 </script>
 
 <footer>

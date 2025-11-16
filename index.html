@@ -1,32 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=AW-16913306718"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-
-    gtag('config', 'AW-16913306718');
-  </script>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>🌟 Join Our Discord Community!</title>
   <link rel="icon" type="image/png" href="discord-favicon.png">
   <style>
-    /* General Reset */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
       color: #fff;
       min-height: 100vh;
-      padding-bottom: 80px; /* space for bottom sticky button */
+      padding-bottom: 80px;
     }
-
     header {
       text-align: center;
       padding: 40px 20px 20px 20px;
@@ -37,37 +24,23 @@
       border-radius: 20px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
-
     header h1 {
       font-size: 3em;
       margin-bottom: 20px;
-      color: #fff;
-      text-shadow: 1px 1px 6px rgba(0,0,0,0.5);
     }
-
-    header p {
-      font-size: 1.3em;
-      margin-bottom: 30px;
-    }
-
+    header p { font-size: 1.3em; margin-bottom: 30px; }
     .btn {
       display: inline-block;
       padding: 18px 40px;
       font-size: 1.2em;
       color: #fff;
       background: rgba(114, 137, 218, 0.8);
-      border: none;
       border-radius: 12px;
       text-decoration: none;
-      transition: all 0.3s ease;
+      transition: .3s;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
-
-    .btn:hover {
-      background: rgba(114, 137, 218, 1);
-      transform: scale(1.05);
-    }
-
+    .btn:hover { background: rgba(114, 137, 218, 1); transform: scale(1.05); }
     section, footer {
       max-width: 900px;
       margin: 40px auto;
@@ -77,41 +50,24 @@
       border-radius: 20px;
       box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     }
-
-    section h2 {
-      font-size: 2.2em;
-      margin-bottom: 20px;
-      text-shadow: 1px 1px 4px rgba(0,0,0,0.4);
-    }
-
-    section p, section ul {
-      font-size: 1.1em;
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-
-    section ul li { margin-left: 20px; }
-
+    section h2 { font-size: 2.2em; margin-bottom: 20px; }
     footer { text-align: center; padding: 40px 20px; }
-    footer a { color: #fff; text-decoration: underline; }
+    .sticky-btn { position: fixed; bottom: 15px; left: 50%; transform: translateX(-50%); }
 
-    .emoji { font-size: 1.2em; margin-right: 8px; }
-
-    /* Bottom sticky join button */
-    .sticky-btn {
-      position: fixed;
-      bottom: 15px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 999;
+    /* Mini-game styles */
+    #gameBox {
+      margin-top: 20px;
+      padding: 20px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 15px;
+      text-align: center;
     }
-
-    /* Optional mobile size adjustment for sticky button */
-    @media (max-width: 600px) {
-      .sticky-btn .btn {
-        padding: 14px 28px;
-        font-size: 1em;
-      }
+    #gameCanvas {
+      background: #111;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 400px;
+      height: 400px;
     }
   </style>
 </head>
@@ -119,44 +75,143 @@
 
 <header>
   <h1>🌟 Welcome to Our Discord Community!</h1>
-  <p>🎮 Chat, 🤝 Connect, and 🌈 Have Fun with People Who Share Your Interests!</p>
+  <p>🎮 Chat, 🤝 Connect, and 🌈 Have Fun!</p>
 </header>
 
 <section>
-  <h2>💎 Why Join Us?</h2>
-  <p>Our community is friendly, active, and moderated. Meet new friends, share your passions, and join events. Whether you love gaming, music, memes, or just chatting, you’ll find your place here. 💬✨</p>
-  <p>We provide:</p>
-  <ul>
-    <li>🎮 Gaming channels for Fortnite, Roblox, Minecraft, and more</li>
-    <li>🎨 Creative channels to share art, videos, and projects</li>
-    <li>🤖 Bots and interactive features for fun and engagement</li>
-    <li>👑 Safe and moderated environment</li>
-  </ul>
+  <h2>🔥 Mini Game: Dodge & Shoot!</h2>
+  <p>Move with WASD, shoot with SPACE. Survive and destroy enemies! The longer you live, the harder it gets 😈</p>
+
+  <div id="gameBox">
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <p id="score">Score: 0</p>
+  </div>
 </section>
 
-<section>
-  <h2>📌 What You Can Do</h2>
-  <p>Join discussions, share memes, attend community events, or participate in competitions. Our channels are organized so you always know where to go. You’ll never miss out on the fun! 🎉</p>
-</section>
+<script>
+const canvas = document.getElementById("gameCanvas");
+const ctx = canvas.getContext("2d");
 
-<section>
-  <h2>🛡️ Rules & Safety</h2>
-  <p>We prioritize a safe environment. No hate speech, spamming, or harassment. Moderators are always online to ensure everyone has a great experience. ✅</p>
-</section>
+let player = { x: 190, y: 350, size: 20, speed: 4, color: "#0f0" };
+let enemies = [];
+let bullets = [];
+let powerUps = [];
+let score = 0;
+let keys = {};
+let enemySpawnRate = 1000;
+let enemySpeedBase = 2;
 
-<section>
-  <h2>🔥 How to Join</h2>
-  <p>Click the button at the bottom of your screen to enter our Discord server. Once inside, introduce yourself and start chatting! 🌟</p>
-</section>
+document.addEventListener('keydown', e => keys[e.key] = true);
+document.addEventListener('keyup', e => keys[e.key] = false);
+
+function spawnEnemy() {
+  enemies.push({ x: Math.random() * 380, y: -20, size: 20, speed: enemySpeedBase + Math.random() * 2 });
+}
+setInterval(spawnEnemy, enemySpawnRate);
+
+function spawnPowerUp() {
+  const types = ["speed", "shield"];
+  const type = types[Math.floor(Math.random() * types.length)];
+  powerUps.push({ x: Math.random() * 380, y: -20, size: 15, type });
+}
+setInterval(() => { if (Math.random() < 0.1) spawnPowerUp(); }, 2000);
+
+function update() {
+  // Player movement
+  if (keys['w'] && player.y > 0) player.y -= player.speed;
+  if (keys['s'] && player.y < 380) player.y += player.speed;
+  if (keys['a'] && player.x > 0) player.x -= player.speed;
+  if (keys['d'] && player.x < 380) player.x += player.speed;
+
+  // Shooting
+  if (keys[' ']) {
+    bullets.push({ x: player.x + player.size / 2 - 3, y: player.y, size: 6, speed: 6 });
+    keys[' '] = false; // prevent continuous shooting
+  }
+
+  // Update bullets
+  bullets.forEach(b => b.y -= b.speed);
+  bullets = bullets.filter(b => b.y > -10);
+
+  // Update enemies
+  enemies.forEach(e => e.y += e.speed);
+  enemies = enemies.filter(e => e.y < 420);
+
+  // Collision bullets vs enemies
+  bullets.forEach((b, i) => {
+    enemies.forEach((e, j) => {
+      if (b.x < e.x + e.size && b.x + b.size > e.x &&
+          b.y < e.y + e.size && b.y + b.size > e.y) {
+        bullets.splice(i, 1);
+        enemies.splice(j, 1);
+        score += 10;
+      }
+    });
+  });
+
+  // Collision player vs enemies
+  enemies.forEach(e => {
+    if (player.x < e.x + e.size && player.x + player.size > e.x &&
+        player.y < e.y + e.size && player.y + player.size > e.y) {
+      alert('Game Over! Your score: ' + score);
+      location.reload();
+    }
+  });
+
+  // Power-up collection
+  powerUps.forEach((p, i) => {
+    if (player.x < p.x + p.size && player.x + player.size > p.x &&
+        player.y < p.y + p.size && player.y + player.size > p.y) {
+      if (p.type === "speed") player.speed += 2;
+      powerUps.splice(i, 1);
+    }
+  });
+
+  // Move power-ups
+  powerUps.forEach(p => p.y += 2);
+  powerUps = powerUps.filter(p => p.y < 420);
+
+  // Increase difficulty
+  if (score % 50 === 0 && score !== 0) {
+    enemySpeedBase += 0.1;
+    enemySpawnRate = Math.max(200, enemySpawnRate - 20);
+  }
+
+  document.getElementById("score").innerText = "Score: " + score;
+}
+
+function draw() {
+  ctx.clearRect(0, 0, 400, 400);
+
+  // Draw player
+  ctx.fillStyle = player.color;
+  ctx.fillRect(player.x, player.y, player.size, player.size);
+
+  // Draw enemies
+  ctx.fillStyle = "#f00";
+  enemies.forEach(e => ctx.fillRect(e.x, e.y, e.size, e.size));
+
+  // Draw bullets
+  ctx.fillStyle = "#ff0";
+  bullets.forEach(b => ctx.fillRect(b.x, b.y, b.size, b.size));
+
+  // Draw power-ups
+  powerUps.forEach(p => {
+    ctx.fillStyle = p.type === "speed" ? "#0ff" : "#f0f";
+    ctx.fillRect(p.x, p.y, p.size, p.size);
+  });
+}
+
+function loop() { update(); draw(); requestAnimationFrame(loop); }
+loop();
+</script>
 
 <footer>
-  <p>&copy; 2025 Discord Community | <a href="https://sirflops4life.github.io/discord-landing">Join Now</a></p>
+  <p>&copy; 2025 Discord Community | <a href="https://discord.gg/EycKmusR6v">Join Now</a></p>
 </footer>
 
-<!-- Sticky Join Button -->
 <div class="sticky-btn">
-  <a class="btn" href="https://sirflops4life.github.io/discord-landing" target="_blank">🚀 Join Discord Now</a>
+  <a class="btn" href="https://discord.gg/EycKmusR6v" target="_blank">🚀 Join Discord Now</a>
 </div>
-
 </body>
 </html>
